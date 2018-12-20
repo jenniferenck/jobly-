@@ -7,6 +7,7 @@ const Router = require('express').Router;
 const Company = require('../models/company');
 const partialUpdate = require('../helpers/partialUpdate');
 const sqlForPartialUpdate = require('../helpers/partialUpdate.js');
+const { validateJSON } = require('../middleware/validation.js');
 
 const router = new Router();
 
@@ -24,7 +25,7 @@ companyRoutes.get('/', async function(req, res, next) {
   }
 });
 
-companyRoutes.post('/', async function(req, res, next) {
+companyRoutes.post('/', validateJSON, async function(req, res, next) {
   try {
     const newCompany = await Company.create(req.body);
     return res.json({ company: newCompany });
@@ -82,5 +83,18 @@ companyRoutes.delete('/:handle', async function(req, res, next) {
     return next(err);
   }
 });
+
+// companyRoutes.post('/with-validation', validateJSON, function(req, res, next) {
+//   const result = validate(req.body, companySchema);
+//   console.log('INSIDE JSON VALIDATE', result);
+//   if (!result.valid) {
+//     let message = result.errors.map(error => error.stack);
+//     let status = 400;
+//     let error = new Error(message, status);
+//     return next(error);
+//   }
+
+//   return res.json(req.body);
+// });
 
 module.exports = companyRoutes;
