@@ -7,15 +7,15 @@ const db = require('../db');
 
 class Company {
   // 1. Get companies by search function:
-  static async searchCompanies(queryString, next) {
+  static async searchCompanies(queryString) {
     // include code from first view
 
-    console.log(queryString);
     let sqlStatment = `SELECT handle, name FROM companies`;
     let idx = 1;
     let minProvided = false;
     let params = [];
 
+    // for more flexible search can provide 'LIKE' * language
     if (queryString.search) {
       // filtering companies return handles and names based on the filter
       sqlStatment += ` WHERE name = $${idx}`;
@@ -39,11 +39,10 @@ class Company {
       if (minProvided) {
         if (queryString.max_employees < queryString.min_employees) {
           const err = new Error('Invalid Parameters...Min should be < Max!');
-          err.status = 400;
           // return res.json({
           //     message: err.message,
           //     status: err.status
-          return next(err);
+          throw err;
         }
       }
       if (idx > 1) {
@@ -57,11 +56,11 @@ class Company {
     // sqlStatment += `;`;
     const result = await db.query(sqlStatment, params);
 
-    if (!result.rows[0]) {
-      const err = new Error('Company not found - try again');
-      err.status = 400;
-      return next(err);
-    }
+    //CR: If not search data, can get empty array TO DELETE
+    // if (!result.rows[0]) {
+    //   const err = new Error('Company not found - try again');
+    //   throw err;
+    // }
 
     return result.rows;
   }
@@ -80,6 +79,11 @@ class Company {
     const result = await db.query(`SELECT * FROM companies WHERE handle = $1`, [
       handle
     ]);
+
+    if (!result.rows[0]) {
+      const err = new Error('Company not found - try again');
+      throw err;
+    }
     return result.rows[0];
   }
 
@@ -96,7 +100,6 @@ class Company {
     );
     if (result.rows.length === 0) {
       let notFoundError = new Error(`No company with handle of ${handle}`);
-      notFoundError.status = 404;
       throw notFoundError;
     }
     return result.rows[0];

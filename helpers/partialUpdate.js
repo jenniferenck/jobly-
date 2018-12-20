@@ -18,7 +18,7 @@ const db = require('../db');
 async function sqlForPartialUpdate(table, items, key, id) {
   // keep track of item indexes
   // store all the columns we want to update and associate with vals
-  console.log(table, items, key, id);
+  // console.log(table, items, key, id);
 
   let idx = 1;
   let columns = [];
@@ -41,10 +41,11 @@ async function sqlForPartialUpdate(table, items, key, id) {
 
   let values = Object.values(items);
   values.push(id);
-  console.log(query, values);
+  // console.log(query, values);
   const result = await db.query(query, values);
   console.log(result.rows[0]);
-  return { query, values };
+  // return { query, values }; // This was the default return. Change it to result.rows[0];
+  return result.rows[0];
 }
 
 module.exports = sqlForPartialUpdate;

@@ -1,51 +1,52 @@
 const express = require('express');
-const companyRoutes = express();
 const db = require('../db');
-// what does BELOW DO?
-const Router = require('express').Router;
+// org tool to help build routes:u
 // Class to be created in models...
 const Company = require('../models/company');
-const partialUpdate = require('../helpers/partialUpdate');
 const sqlForPartialUpdate = require('../helpers/partialUpdate.js');
-const { validateJSON } = require('../middleware/validation.js');
+const { validateCompanyJSON } = require('../middleware/validation.js');
 
-const router = new Router();
+const router = new express.Router();
 
 // GET /companies
 // This should return a the handle and name for all of the company objects. It should also allow for the following query string parameters
 // search. If the query string parameter is passed, a filtered list of handles and names handles should be displayed based on the search term and if the name includes it.
-companyRoutes.get('/', async function(req, res, next) {
+router.get('/', async function(req, res, next) {
   try {
     console.log(req.query);
-    const companies = await Company.searchCompanies(req.query, next);
+    const companies = await Company.searchCompanies(req.query);
 
     return res.json({ companies: companies });
   } catch (error) {
+    error.status = 404;
     return next(error);
   }
 });
 
-companyRoutes.post('/', validateJSON, async function(req, res, next) {
+router.post('/', validateCompanyJSON, async function(req, res, next) {
   try {
     const newCompany = await Company.create(req.body);
     return res.json({ company: newCompany });
   } catch (err) {
+    err.status = 409; // conflict error
     return next(err);
   }
 });
 
 // Get company details by handle name in query param
-companyRoutes.get('/:handle', async function(req, res, next) {
+router.get('/:handle', async function(req, res, next) {
   try {
     const companyData = await Company.getCompany(req.params.handle);
     return res.json({ company: companyData });
   } catch (err) {
+    err.status = 404;
     return next(err);
   }
 });
 
 // Update company in query param by items passed in req. body
-companyRoutes.patch('/:handle', async function(req, res, next) {
+// CAN ADD OWN VALIDATION SCHEMA with 'optional' fields
+router.patch('/:handle', async function(req, res, next) {
   try {
     // ARGS: (table, items, key, id)
     const table = 'companies';
@@ -60,8 +61,8 @@ companyRoutes.patch('/:handle', async function(req, res, next) {
     // 	"primary_key": "handle",
     // 	"value": "goog"
     // }
-    console.log('key:', key);
-    console.log('obj:', req.params);
+    // console.log('key:', key);
+    // console.log('obj:', req.params);
 
     const items = req.body;
 
@@ -74,17 +75,18 @@ companyRoutes.patch('/:handle', async function(req, res, next) {
 });
 
 // Delete company in query param
-companyRoutes.delete('/:handle', async function(req, res, next) {
+router.delete('/:handle', async function(req, res, next) {
   try {
     const companyData = await Company.deleteCompany(req.params.handle);
     console.log(companyData);
     return res.json({ message: 'Company deleted' });
   } catch (err) {
+    err.status = 404;
     return next(err);
   }
 });
 
-// companyRoutes.post('/with-validation', validateJSON, function(req, res, next) {
+// router.post('/with-validation', validateJSON, function(req, res, next) {
 //   const result = validate(req.body, companySchema);
 //   console.log('INSIDE JSON VALIDATE', result);
 //   if (!result.valid) {
@@ -97,4 +99,4 @@ companyRoutes.delete('/:handle', async function(req, res, next) {
 //   return res.json(req.body);
 // });
 
-module.exports = companyRoutes;
+module.exports = router;

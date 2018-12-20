@@ -4,7 +4,7 @@ const { validate } = require('jsonschema');
 const companySchema = require('../schemas/companySchema.json');
 // const message = require('../models/message');
 
-async function validateJSON(req, res, next) {
+async function validateCompanyJSON(req, res, next) {
   try {
     const result = validate(req.body, companySchema);
     console.log('INSIDE JSON VALIDATE', result);
@@ -23,5 +23,5 @@ async function validateJSON(req, res, next) {
 
 // TO DO: Add middleware for PATCH
 module.exports = {
-  validateJSON
+  validateCompanyJSON
 };
