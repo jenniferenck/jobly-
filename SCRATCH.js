@@ -31,5 +31,12 @@ Didnt work in test for patch
       num_employees: 123
     });
 
-
+from Job POST
+let job = await Job.create({
+      title: req.body.title,
+      salary: req.body.salary,
+      equity: req.body.equity,
+      company_handle: req.body.company_handle
+    });
+    
 **/
