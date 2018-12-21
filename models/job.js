@@ -11,12 +11,12 @@ class Job {
   // Model POST new job
   static async create(objectFromBody) {
     const { title, salary, equity, company_handle } = objectFromBody;
-    console.log(title, salary, equity, company_handle);
+    // console.log(title, salary, equity, company_handle);
     const result = await db.query(
       `INSERT INTO jobs (title, salary, equity, company_handle, date_posted) VALUES ($1, $2, $3, $4, current_timestamp) RETURNING *`,
       [title, salary, equity, company_handle]
     );
-    console.log('result.rows = ', result.rows);
+    // console.log('result.rows = ', result.rows);
     if (result.rows.length === 0) {
       throw new APIError(400, 'Cannot add job');
     }
@@ -114,7 +114,7 @@ class Job {
       `DELETE FROM jobs WHERE id = $1 RETURNING *`,
       [id]
     );
-    console.log(result);
+    // console.log(result);
 
     return result.rows[0];
   }

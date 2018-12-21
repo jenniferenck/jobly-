@@ -43,7 +43,7 @@ async function sqlForPartialUpdate(table, items, key, id) {
   values.push(id);
   // console.log(query, values);
   const result = await db.query(query, values);
-  console.log(result.rows[0]);
+  // console.log(result.rows[0]);
   // return { query, values }; // This was the default return. Change it to result.rows[0];
   return result.rows[0];
 }

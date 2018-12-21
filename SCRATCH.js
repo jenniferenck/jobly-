@@ -39,6 +39,22 @@ let job = await Job.create({
       company_handle: req.body.company_handle
     });
     
+
+Edit POST /users/ to create a new user, admin or noth and return {token : token}
+
+- 
+
+- Create routes/auth.js  
+
+- Add in auth.js
+const jwt = require("jsonwebtoken");
+const { SECRET_KEY } = require("../config");
+const router = new Router();
+
+// Has one function for login login: {username, password} => {token}
+
+router.post("/login", async function (req, res, next) {})
+
 **/
 
 // To change table properties: ALTER TABLE "jobs" ALTER COLUMN "date_posted" SET DEFAULT CURRENT_TIMESTAMP

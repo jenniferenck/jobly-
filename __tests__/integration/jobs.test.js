@@ -23,14 +23,10 @@ beforeEach(async function() {
   //   2. create a job from the above company
   //   CHECK THAT TIMESTAMP IS BEING AUT0-GENERATED...
   job = await db.query(
-    `INSERT INTO jobs (title, salary, equity, company_handle) VALUES ('Accountant', 100000, .005, 'test') RETURNING *`
+    `INSERT INTO jobs (title, salary, equity, company_handle, id) VALUES ('Accountant', 100000, .005, 'test', 1) RETURNING *`
   );
-  //   console.log('JOB IS --------- ', job);
+  // console.log('JOB IS --------- ', job);
 });
-
-// describe('Test Job class', async function() {
-
-// });
 
 // GET & SEARCh jobs by name, salary & equity
 
@@ -49,7 +45,7 @@ describe('Search for all jobs with name, salary and equity criteria', async func
 
   test('returns data after search with min_salary', async function() {
     const response = await request(app).get(`/jobs?min_salary=50000`);
-    console.log('IN TEST ', response.body.jobs);
+    // console.log('IN TEST ', response.body.jobs);
 
     expect(response.body.jobs[0]).toHaveProperty('title');
   });
@@ -74,7 +70,7 @@ describe('Search for all jobs with name, salary and equity criteria', async func
       `/jobs?search=Accountant&min_salary=90000`
     );
     expect(response.statusCode).toBe(200);
-    console.log('response.body -----', response.body);
+    // console.log('response.body -----', response.body);
     expect(response.body.jobs[0].title).toEqual('Accountant');
   });
 
@@ -84,6 +80,37 @@ describe('Search for all jobs with name, salary and equity criteria', async func
     );
     expect(response.statusCode).toBe(200);
     expect(response.body.jobs[0].title).toEqual('Accountant');
+  });
+});
+
+describe('Getting, Patching & Deleting tests by id', async function() {
+  test('can get', async function() {
+    const response = await request(app).get(`/jobs/1`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.job.company_handle).toEqual('test');
+    expect(response.body.job).toHaveProperty('title');
+  });
+
+  test('can patch', async function() {
+    const response = await request(app)
+      .patch(`/jobs/1`)
+      .send({ salary: 1 }, 'id');
+    expect(response.body).toMatchObject({
+      title: 'Accountant',
+      salary: 1,
+      // date_posted: expect.any(Date),
+      equity: 0.005,
+      id: 1,
+      company_handle: 'test'
+    });
+  });
+
+  test('can delete', async function() {
+    const response = await request(app).delete(`/jobs/1`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(
+      `Job id: 1 for Accountant successfully deleted`
+    );
   });
 });
 

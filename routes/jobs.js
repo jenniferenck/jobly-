@@ -39,7 +39,7 @@ router.post('/', validateJobJSON, async function(req, res, next) {
 router.get('/:id', async function(req, res, next) {
   try {
     let jobData = await Job.getJob(req.params.id);
-    return res.json({ job: jobData });
+    return res.json({ job: jobData[0] });
   } catch (error) {
     error.status = 400;
     return next(error);
