@@ -5,13 +5,18 @@ const db = require('../db');
 const Company = require('../models/company');
 const sqlForPartialUpdate = require('../helpers/partialUpdate.js');
 const { validateCompanyJSON } = require('../middleware/validation.js');
+const {
+  ensureLoggedIn,
+  ensureCorrectUser,
+  ensureAdminUser
+} = require('../middleware/auth.js');
 
 const router = new express.Router();
 
 // GET /companies
 // This should return a the handle and name for all of the company objects. It should also allow for the following query string parameters
 // search. If the query string parameter is passed, a filtered list of handles and names handles should be displayed based on the search term and if the name includes it.
-router.get('/', async function(req, res, next) {
+router.get('/', ensureLoggedIn, async function(req, res, next) {
   try {
     console.log(req.query);
     const companies = await Company.searchCompanies(req.query);
@@ -23,7 +28,11 @@ router.get('/', async function(req, res, next) {
   }
 });
 
-router.post('/', validateCompanyJSON, async function(req, res, next) {
+router.post('/', validateCompanyJSON, ensureAdminUser, async function(
+  req,
+  res,
+  next
+) {
   try {
     const newCompany = await Company.create(req.body);
     return res.json({ company: newCompany });
@@ -34,7 +43,7 @@ router.post('/', validateCompanyJSON, async function(req, res, next) {
 });
 
 // Get company details by handle name in query param
-router.get('/:handle', async function(req, res, next) {
+router.get('/:handle', ensureLoggedIn, async function(req, res, next) {
   try {
     const companyData = await Company.getCompany(req.params.handle);
     return res.json({ company: companyData });
@@ -46,7 +55,7 @@ router.get('/:handle', async function(req, res, next) {
 
 // Update company in query param by items passed in req. body
 // CAN ADD OWN VALIDATION SCHEMA with 'optional' fields
-router.patch('/:handle', async function(req, res, next) {
+router.patch('/:handle', ensureAdminUser, async function(req, res, next) {
   try {
     // ARGS: (table, items, key, id)
     const table = 'companies';
@@ -75,7 +84,7 @@ router.patch('/:handle', async function(req, res, next) {
 });
 
 // Delete company in query param
-router.delete('/:handle', async function(req, res, next) {
+router.delete('/:handle', ensureAdminUser, async function(req, res, next) {
   try {
     const companyData = await Company.deleteCompany(req.params.handle);
     console.log(companyData);

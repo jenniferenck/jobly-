@@ -1,7 +1,8 @@
-import { checkServerIdentity } from 'tls';
+/** 
+ * 
+ * import { checkServerIdentity } from 'tls';
 import { searchCompanies } from './models/company';
 
-/** 
 
 "test": "echo \"Error: no test specified\" && exit 1",
 
@@ -46,10 +47,6 @@ Edit POST /users/ to create a new user, admin or noth and return {token : token}
 
 - Create routes/auth.js  
 
-- Add in auth.js
-const jwt = require("jsonwebtoken");
-const { SECRET_KEY } = require("../config");
-const router = new Router();
 
 // Has one function for login login: {username, password} => {token}
 

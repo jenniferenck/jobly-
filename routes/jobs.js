@@ -6,11 +6,12 @@ const Job = require('../models/job');
 // const partialUpdate = require('../helpers/partialUpdate');
 const sqlForPartialUpdate = require('../helpers/partialUpdate.js');
 const { validateJobJSON } = require('../middleware/validation.js');
+const { ensureLoggedIn, ensureAdminUser } = require('../middleware/auth.js');
 
 const router = new express.Router({ mergeParams: true });
 
 // GET/ SEARCH by job
-router.get('/', async function(req, res, next) {
+router.get('/', ensureLoggedIn, async function(req, res, next) {
   try {
     // console.log(req.query);
     const jobs = await Job.searchJobs(req.query);
@@ -23,7 +24,11 @@ router.get('/', async function(req, res, next) {
 
 // POST new job
 // Should edit this to IF ERROR THROW
-router.post('/', validateJobJSON, async function(req, res, next) {
+router.post('/', validateJobJSON, ensureAdminUser, async function(
+  req,
+  res,
+  next
+) {
   try {
     // console.log('req.body is ', req.body);
     let jobData = await Job.create(req.body);
@@ -37,7 +42,7 @@ router.post('/', validateJobJSON, async function(req, res, next) {
 
 // GET job by id
 
-router.get('/:id', async function(req, res, next) {
+router.get('/:id', ensureLoggedIn, async function(req, res, next) {
   try {
     let jobData = await Job.getJob(req.params.id);
     return res.json({ job: jobData[0] });
@@ -48,7 +53,7 @@ router.get('/:id', async function(req, res, next) {
 });
 
 // PATCH/ update job by id
-router.patch('/:id', async function(req, res, next) {
+router.patch('/:id', ensureAdminUser, async function(req, res, next) {
   try {
     // send partial data change updates to db
     console.log(req.params.id);
@@ -68,7 +73,7 @@ router.patch('/:id', async function(req, res, next) {
 
 // DELETE job by id
 
-router.delete('/:id', async function(req, res, next) {
+router.delete('/:id', ensureAdminUser, async function(req, res, next) {
   try {
     // take id and delete company
     const id = req.params.id;

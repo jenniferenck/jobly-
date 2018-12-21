@@ -3,15 +3,18 @@ const APIError = require('../helpers/APIError');
 const db = require('../db');
 const sqlForPartialUpdate = require('../helpers/partialUpdate.js');
 
-// const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { SECRET_KEY, BCRYPT_WORK_ROUNDS } = require('../config');
+
+const bcrypt = require('bcrypt');
 
 /** Users on the site. */
 
 class User {
-  // Post a new user
+  // Post/ register a new user
   // For tests, should get a 409 if username/ email already exists
 
-  static async create(objectFromBody) {
+  static async register(objectFromBody) {
     const {
       username,
       password,
@@ -33,6 +36,7 @@ class User {
         'Username/email is already taken, please choose another combo'
       );
     }
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_ROUNDS);
 
     const result = await db.query(
       `INSERT INTO users (username,
@@ -42,13 +46,27 @@ class User {
         email,
         photo_url,
         is_admin) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [username, password, first_name, last_name, email, photo_url, is_admin]
+      [
+        username,
+        hashedPassword,
+        first_name,
+        last_name,
+        email,
+        photo_url,
+        is_admin
+      ]
     );
     console.log('result.rows = ', result.rows);
-    if (result.rows.length === 0) {
-      throw new APIError(400, 'Cannot add job');
-    }
-    return result.rows;
+    // Do we need this error?
+    // if (result.rows.length === 0) {
+    //   throw new APIError(400, 'Cannot add job');
+    // }
+
+    // generate loginToken...
+    const token = jwt.sign({ username }, SECRET_KEY);
+    return token;
+
+    // return result.rows;
   }
 
   // Get all users
@@ -109,6 +127,29 @@ class User {
       [username]
     );
     return result.rows[0];
+  }
+
+  static async loginGetToken(username, password) {
+    // authenticate
+
+    const result = await db.query(
+      `SELECT password FROM USERS WHERE username = $1`,
+      [username]
+    );
+    console.log(
+      'IN user.js model ---------',
+      password,
+      result.rows[0].password
+    );
+    const hashedPassword = result.rows[0];
+    if (hashedPassword) {
+      if (await bcrypt.compare(password, hashedPassword.password)) {
+        let token = jwt.sign({ username }, SECRET_KEY, {});
+        console.log('TOKEN ------', token);
+        return token;
+      }
+      throw new Error({ message: 'Invalid user/password' });
+    }
   }
 }
 

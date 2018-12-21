@@ -1,4 +1,5 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 
 // Class import
 const User = require('../models/user');
@@ -6,13 +7,15 @@ const { validateUserJSON } = require('../middleware/validation.js');
 
 const router = new express.Router({ mergeParams: true });
 
+const { ensureCorrectUser } = require('../middleware/auth.js');
+
 // POST new user
 router.post('/', validateUserJSON, async function(req, res, next) {
   try {
-    console.log('req.body is ----', req.body);
-    let userData = await User.create(req.body);
-    console.log(userData);
-    return res.json({ users: userData });
+    // checks for exisiting user...
+    let newUserToken = await User.register(req.body);
+    console.log(newUserToken);
+    return res.json({ token: newUserToken });
   } catch (err) {
     err.status = 409; // conflict error - user already exists
     return next(err);
@@ -43,7 +46,8 @@ router.get('/:username', async function(req, res, next) {
 });
 
 // Update username in query params with data in req. body
-router.patch('/:username', async function(req, res, next) {
+router.patch('/:username', ensureCorrectUser, async function(req, res, next) {
+  console.log('request.body', req.body);
   try {
     const table = 'users';
     const id = req.params.username;
@@ -57,7 +61,7 @@ router.patch('/:username', async function(req, res, next) {
   }
 });
 
-router.delete('/:username', async function(req, res, next) {
+router.delete('/:username', ensureCorrectUser, async function(req, res, next) {
   try {
     const username = req.params.username;
     await User.deleteUser(username);
