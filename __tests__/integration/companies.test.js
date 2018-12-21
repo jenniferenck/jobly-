@@ -18,7 +18,6 @@ describe('Setup for company routes', async function() {
     );
   });
 
-  // FINISH THIS!
   // GET & SEARCh companies by name and size
 
   // describe()
