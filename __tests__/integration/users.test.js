@@ -11,22 +11,52 @@ const db = require('../../db');
 /**can write raw sql to create a user */
 
 beforeEach(async function() {
-  // 1. create a company in the jobly-test
+  // 1. create a user in the jobly-test
   await db.query(
-    `INSERT INTO companies (handle, name, num_employees, description, logo_url) VALUES ('test', 'test-company', 100, 'This is a test description', 'http://www.logo.com') RETURNING *`
+    `INSERT INTO users (username,
+        password,
+        first_name,
+        last_name,
+        email,
+        photo_url,
+        is_admin) VALUES ('testuser', 'password', 'first_name',
+        'last_name',
+        'email',
+        'photo_url',
+        true ) RETURNING *`
   );
 
-  //   2. create a job from the above company
-  //   CHECK THAT TIMESTAMP IS BEING AUT0-GENERATED...
-  await db.query(
-    `INSERT INTO jobs (title, salary, equity, company_handle, id) VALUES ('Accountant', 100000, .005, 'test', 1) RETURNING *`
-  );
-  // console.log('JOB IS --------- ', job);
+  // TO DELETE
+  // // 1. create a company in the jobly-test
+  // await db.query(
+  //   `INSERT INTO companies (handle, name, num_employees, description, logo_url) VALUES ('test', 'test-company', 100, 'This is a test description', 'http://www.logo.com') RETURNING *`
+  // );
 
-  // 3. create a new user
-  const user = `INSERT INTO users (username, password, first_name, last_name, email, photo_url) VALUES (test, Test, User, test@test.com, http://www.google.com)`;
-  console.log(user);
+  // //   2. create a job from the above company
+  // //   CHECK THAT TIMESTAMP IS BEING AUT0-GENERATED...
+  // await db.query(
+  //   `INSERT INTO jobs (title, salary, equity, company_handle, id) VALUES ('Accountant', 100000, .005, 'test', 1) RETURNING *`
+  // );
+  // // console.log('JOB IS --------- ', job);
+
+  // // 3. create a new user
+  // const user = `INSERT INTO users (username, password, first_name, last_name, email, photo_url) VALUES (test, Test, User, test@test.com, http://www.google.com)`;
+  // console.log(user);
 });
+
+// 1. GET & SEARCh jobs by name, salary & equity
+
+// describe('Test Job class', async function() {
+
+// });
+
+// 2. GET job by ID
+
+// 3. POST a new job
+
+// 4. PATCH an existing job
+
+// 5. DELETE an existing job
 
 afterEach(async function() {
   // remove companies created after tests

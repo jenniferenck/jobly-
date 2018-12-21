@@ -1,13 +1,35 @@
 const express = require('express');
-const db = require('../db');
-// Class to be created in models...
+
+// Class import
 const User = require('../models/user');
-// below should only be utilized by Jobs Class
-// const partialUpdate = require('../helpers/partialUpdate');
-const sqlForPartialUpdate = require('../helpers/partialUpdate.js');
 const { validateUserJSON } = require('../middleware/validation.js');
 
 const router = new express.Router();
+
+// POST new user
+router.post('/', validateUserJSON, async function(req, res, next) {
+  try {
+    console.log('req.body is ----', req.body);
+    let userData = await User.create(req.body);
+    console.log(userData);
+    return res.json({ users: userData });
+  } catch (err) {
+    err.status = 409; // conflict error - user already exists
+    return next(err);
+  }
+});
+
+// GET user by id
+
+router.get('/:username', async function(req, res, next) {
+  try {
+    let userData = await User.getUser(req.params.username);
+    return res.json({ user: userData });
+  } catch (error) {
+    error.status = 400;
+    return next(error);
+  }
+});
 
 // Update username in query params with data in req. body
 router.patch('/:username', async function(req, res, next) {

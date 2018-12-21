@@ -9,6 +9,7 @@ const sqlForPartialUpdate = require('../helpers/partialUpdate.js');
 
 class Job {
   // Model POST new job
+
   static async create(objectFromBody) {
     const { title, salary, equity, company_handle } = objectFromBody;
     // console.log(title, salary, equity, company_handle);
