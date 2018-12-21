@@ -20,18 +20,7 @@ app.use('/companies', companyRoutes);
 app.use('/jobs', jobRoutes);
 app.use('/users', userRoutes);
 
-// global error handler
-app.use(function(err, req, res, next) {
-  // all errors that get to here get coerced into API Errors
-  if (!(err instanceof APIError)) {
-    err = new APIError(err.message, err.status);
-  }
-  return res.status(err.status).json(err);
-});
-
-/** 404 handler */
-
-app.use(function(req, res, next) {
+app.get('*', function(req, res, next) {
   const err = new Error('Not Found');
   err.status = 404;
 
@@ -39,15 +28,14 @@ app.use(function(req, res, next) {
   return next(err);
 });
 
-/** general error handler */
-
+// global error handler
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
+  // all errors that get to here get coerced into API Errors
 
-  return res.json({
-    error: err,
-    message: err.message
-  });
+  if (!(err instanceof APIError)) {
+    err = new APIError(err.message, err.status);
+  }
+  return res.status(err.status).json(err);
 });
 
 module.exports = app;

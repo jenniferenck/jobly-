@@ -101,19 +101,21 @@ class Job {
   }
 
   // Model DELETE job by id
-  static async deleteJob(id) {
+  static async deleteJob(id_val) {
     // check db for job by ID
+    console.log('this id should be 5 in test pre DB-----', id_val);
     const search = await db.query(`SELECT id, title FROM jobs WHERE id = $1`, [
-      id
+      id_val
     ]);
 
     if (search.rows.length === 0) {
-      throw new Error(`No job with id of ${id} exists`);
+      throw new Error(`No job with id of ${id_val} exists`);
     }
-
+    console.log('this id should be 5 in test post DB-----', id_val);
+    console.log('search------', search);
     const result = await db.query(
       `DELETE FROM jobs WHERE id = $1 RETURNING *`,
-      [id]
+      [id_val]
     );
     // console.log(result);
 

@@ -7,12 +7,12 @@ const Job = require('../models/job');
 const sqlForPartialUpdate = require('../helpers/partialUpdate.js');
 const { validateJobJSON } = require('../middleware/validation.js');
 
-const router = new express.Router();
+const router = new express.Router({ mergeParams: true });
 
 // GET/ SEARCH by job
 router.get('/', async function(req, res, next) {
   try {
-    console.log(req.query);
+    // console.log(req.query);
     const jobs = await Job.searchJobs(req.query);
     return res.json({ jobs: jobs });
   } catch (error) {
@@ -25,9 +25,9 @@ router.get('/', async function(req, res, next) {
 // Should edit this to IF ERROR THROW
 router.post('/', validateJobJSON, async function(req, res, next) {
   try {
-    console.log('req.body is ', req.body);
+    // console.log('req.body is ', req.body);
     let jobData = await Job.create(req.body);
-    console.log(jobData);
+    // console.log(jobData);
     return res.json({ jobs: jobData });
   } catch (err) {
     err.status = 409; // conflict error
@@ -67,12 +67,14 @@ router.patch('/:id', async function(req, res, next) {
 });
 
 // DELETE job by id
+
 router.delete('/:id', async function(req, res, next) {
   try {
     // take id and delete company
     const id = req.params.id;
+    console.log('this id should be 5 in route -----', id);
     const deletedJob = await Job.deleteJob(id);
-    console.log(deletedJob);
+    // console.log(deletedJob);
 
     // return res.json('Job successfully deleted');
     return res.json(

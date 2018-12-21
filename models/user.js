@@ -51,6 +51,17 @@ class User {
     return result.rows;
   }
 
+  // Get all users
+  static async getAllUsers() {
+    const result = await db.query(
+      `SELECT username, first_name, last_name, email FROM users`
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error(`Sorry, no user in database`);
+    }
+    return result.rows;
+  }
   // Get a user by id
 
   static async getUser(username) {

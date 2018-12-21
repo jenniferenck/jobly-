@@ -4,7 +4,7 @@ const express = require('express');
 const User = require('../models/user');
 const { validateUserJSON } = require('../middleware/validation.js');
 
-const router = new express.Router();
+const router = new express.Router({ mergeParams: true });
 
 // POST new user
 router.post('/', validateUserJSON, async function(req, res, next) {
@@ -16,6 +16,17 @@ router.post('/', validateUserJSON, async function(req, res, next) {
   } catch (err) {
     err.status = 409; // conflict error - user already exists
     return next(err);
+  }
+});
+
+// GET all users
+router.get('/', async function(req, res, next) {
+  try {
+    const allUsers = await User.getAllUsers();
+    return res.json({ users: allUsers });
+  } catch (error) {
+    error.status = 400;
+    return next(error);
   }
 });
 
