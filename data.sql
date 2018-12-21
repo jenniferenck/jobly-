@@ -14,7 +14,7 @@ CREATE TABLE jobs
     salary FLOAT NOT NULL, 
     equity FLOAT NOT NULL CHECK (equity >= 0 and equity <= 1), 
     company_handle text,
-    date_posted TIMESTAMP NOT NULL,
+    date_posted TIMESTAMP NOT NULL DEFAULT current_timestamp,
     FOREIGN KEY (company_handle) REFERENCES companies(handle) ON DELETE CASCADE
 );
 
@@ -28,3 +28,5 @@ CREATE TABLE users
     photo_url text,
     is_admin BOOLEAN DEFAULT FALSE NOT NULL 
 )
+
+-- ALTER TABLE "jobs" ALTER COLUMN "date_posted" SET DEFAULT CURRENT_TIMESTAMP

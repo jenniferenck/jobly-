@@ -40,3 +40,5 @@ let job = await Job.create({
     });
     
 **/
+
+// To change table properties: ALTER TABLE "jobs" ALTER COLUMN "date_posted" SET DEFAULT CURRENT_TIMESTAMP
