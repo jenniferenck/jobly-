@@ -22,6 +22,7 @@ router.get('/', async function(req, res, next) {
 });
 
 // POST new job
+// Should edit this to IF ERROR THROW
 router.post('/', validateJobJSON, async function(req, res, next) {
   try {
     console.log('req.body is ', req.body);

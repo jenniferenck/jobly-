@@ -87,6 +87,23 @@ describe('Search for all jobs with name, salary and equity criteria', async func
   });
 });
 
+// 2. GET job by ID
+// check that ID matches search
+// check for 404 if invalid search
+
+// 3. POST a new job
+// check for 409 if job already exists
+// check response for newly created job
+
+// 4. PATCH an existing job
+// check that validation is working correctly - did we add?
+//
+
+// 5. DELETE an existing job
+// check that we 1st search for the job before deleting it
+// check for message of deleted job
+// check for cascade on delete??
+
 afterEach(async function() {
   // remove companies created after tests
   await db.query(`DELETE FROM companies`);
